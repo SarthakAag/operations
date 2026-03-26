@@ -8,7 +8,7 @@ Trains TWO ML models used by the AI Support system:
     Output : predicted category  (database / application / infrastructure /
                                    network / security)
              predicted priority  (P1 / P2 / P3 / P4)
-    Algorithm : TF-IDF vectorizer + MultiOutput RandomForestClassifier
+    Algorithm : embedding system + MultiOutput RandomForestClassifier
 
   MODEL 2 — anomaly_model.pkl
     Input  : system metrics snapshot
