@@ -78,29 +78,10 @@ User → API → NLP Model → Similarity Engine → Confidence Model → Govern
 
 
 ## Project Structure
-ai-ops-backend/
-│
-├── api.py
-├── app/
-│   ├── routes/
-│   │   ├── tickets.py
-│   │   └── admin.py
-│   ├── services/
-│   │   ├── similarity_service.py
-│   │   ├── confidence_ml_service.py
-│   │   └── governance_service.py
-│
-├── data/
-│   └── tickets.csv
-│
-├── models/
-│   └── *.pkl
-│
-├── frontend/
-│   └── admin.html
-│
-├── requirements.txt
-└── README.md
+<img width="370" height="687" alt="Screenshot 2026-03-26 192801" src="https://github.com/user-attachments/assets/98b56ece-38d5-46a3-b8e5-a984467370a1" />
+<img width="379" height="610" alt="Screenshot 2026-03-26 192829" src="https://github.com/user-attachments/assets/e4d0b60e-0467-4e39-b99b-62bddf6a213a" />
+
+
 
 
 ## Setup Instructions
@@ -142,7 +123,7 @@ frontend/admin.html
 
 1. Submit a ticket:
 
-```json
+json
 {
   "title": "Database connection timeout",
   "description": "Connection pool exhausted"
@@ -157,7 +138,7 @@ frontend/admin.html
 
 3. Returns:
 
-```json
+json
 {
   "decision": "auto_resolve",
   "recommended_fix": "...",
