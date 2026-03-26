@@ -180,10 +180,8 @@ json
 
 Developed as part of an AI-driven operations system project.
 
----
 
-## ⭐ Final Note
+##  Final Note
 
 This project demonstrates how AI can **augment IT operations**, balancing **automation with safety**, making it suitable for real-world enterprise environments.
 
----
