@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 30px; background: #111; color: white; }
+        .card { background: #1f2937; padding: 20px; margin: 10px; border-radius: 10px; }
+        .grid { display: flex; gap: 20px; }
+        button { padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h2>📊 Admin Dashboard</h2>
+
+<div class="grid">
+    <div class="card" id="metrics"></div>
+</div>
+
+<h3>🧾 Tickets</h3>
+<div id="tickets"></div>
+
+<script>
+async function loadDashboard() {
+    const metricsRes = await fetch("http://localhost:8000/api/v1/admin/metrics");
+    const metrics = await metricsRes.json();
+
+document.getElementById("metrics").innerHTML = `
+    <b>Total:</b> ${metrics.total_tickets || 0}<br>
+    <b>Auto Resolved:</b> ${metrics.auto_resolved || 0}<br>
+    <b>Human Review:</b> ${metrics.human_review || 0}<br>
+    <b>Auto Rate:</b> ${metrics.auto_resolve_rate ? (metrics.auto_resolve_rate * 100).toFixed(1) : 0}%<br>
+    <b>Avg Confidence:</b> ${(metrics.avg_confidence || metrics.avg_confidence_score || 0)}
+`;
+
+    const ticketsRes = await fetch("http://localhost:8000/api/v1/admin/tickets");
+    const data = await ticketsRes.json();
+
+    document.getElementById("tickets").innerHTML =
+        data.tickets.map(t => `
+            <div class="card">
+                <b>${t.title}</b><br>
+                Decision: ${t.governance.routing_decision}<br>
+                Confidence: ${(t.confidence_score * 100).toFixed(1)}%<br>
+
+                <button onclick="override('${t.ticket_id}','auto_resolve')">
+                    Force Auto Resolve
+                </button>
+
+                <button onclick="override('${t.ticket_id}','human_review')">
+                    Send to Human
+                </button>
+            </div>
+        `).join("");
+}
+
+async function override(id, decision) {
+    await fetch(`http://localhost:8000/api/v1/admin/override/${id}?decision=${decision}`, {
+        method: "POST"
+    });
+
+    alert("Updated!");
+    loadDashboard();
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

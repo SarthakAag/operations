@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AI Support System</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: #0f1117;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 28px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .header-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #6366f1;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #6366f1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Card */
+        .card {
+            background: #1a1d27;
+            border: 1px solid #2a2d3a;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+        }
+
+        /* Form */
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 7px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: #0f1117;
+            border: 1px solid #2a2d3a;
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input::placeholder, textarea::placeholder { color: #3d4560; }
+
+        input:focus, textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        /* Button */
+        button {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.99); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Loading */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Result */
+        #result { margin-top: 20px; }
+
+        .result-card {
+            background: #1a1d27;
+            border: 1px solid #2a2d3a;
+            border-radius: 16px;
+            padding: 24px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #475569;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #2a2d3a;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: #0f1117;
+            border: 1px solid #2a2d3a;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Priority badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .p1 { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .p2 { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+        .p3 { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+
+        /* Confidence bar */
+        .confidence-bar {
+            height: 5px;
+            background: #2a2d3a;
+            border-radius: 99px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+            border-radius: 99px;
+            transition: width 0.8s ease;
+        }
+
+        /* Full-width info rows */
+        .info-row {
+            background: #0f1117;
+            border: 1px solid #2a2d3a;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .info-row .stat-label { margin-bottom: 4px; }
+
+        .info-row pre {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 13px;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+
+        .similar-title {
+            font-size: 14px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .similar-score {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        /* Error */
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #f87171;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-badge">AI-Powered</div>
+        <h1>Support Ticket</h1>
+        <p>Describe your issue and our AI will classify and route it instantly.</p>
+    </div>
+
+    <div class="card">
+        <div class="field">
+            <label>Title</label>
+            <input id="title" placeholder="Brief summary of the issue">
+        </div>
+        <div class="field">
+            <label>Description</label>
+            <textarea id="desc" placeholder="Describe the problem in detail…"></textarea>
+        </div>
+        <button id="submitBtn" onclick="submitTicket()">
+            <span>⚡</span> Analyze & Submit
+        </button>
+    </div>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function submitTicket() {
+    const title = document.getElementById("title").value;
+    const description = document.getElementById("desc").value;
+    const btn = document.getElementById("submitBtn");
+    const resultEl = document.getElementById("result");
+
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spinner"></div> Analyzing…`;
+
+    try {
+        const res = await fetch("http://localhost:8000/api/v1/tickets/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title,
+                description,
+                reporter: "frontend@test.com",
+                is_vip: false
+            })
+        });
+
+        const data = await res.json();
+        const priorityClass = data.classification.predicted_priority.toLowerCase();
+        const confidence = (data.confidence_score * 100).toFixed(1);
+
+        resultEl.innerHTML = `
+            <div class="result-card">
+                <div class="result-title">Analysis Results</div>
+
+                <div class="result-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Category</div>
+                        <div class="stat-value">${data.classification.predicted_category}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Priority</div>
+                        <div class="stat-value">
+                            <span class="badge ${priorityClass}">${data.classification.predicted_priority}</span>
+                        </div>
+                    </div>
+                    <div class="stat-box" style="grid-column: span 2">
+                        <div class="stat-label">Confidence — ${confidence}%</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${confidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="stat-label">Routing Decision</div>
+                    <pre>${data.governance.routing_decision}</pre>
+                </div>
+
+                <div class="info-row">
+                    <div class="stat-label">Recommended Fix</div>
+                    <pre>${data.recommended_fix || "No recommendation available."}</pre>
+                </div>
+
+                <div class="info-row">
+                    <div class="stat-label">Top Similar Ticket</div>
+                    ${data.similar_tickets.length > 0
+                        ? `<div class="similar-title">${data.similar_tickets[0].title}</div>
+                           <div class="similar-score">Similarity score: ${data.similar_tickets[0].similarity_score}</div>`
+                        : `<div class="similar-score">No similar tickets found.</div>`
+                    }
+                </div>
+            </div>
+        `;
+
+    } catch (err) {
+        resultEl.innerHTML = `
+            <div class="error-box">
+                ❌ Unable to reach the backend. Please check your connection and try again.
+            </div>
+        `;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡</span> Analyze & Submit`;
+    }
+}
+</script>
+
+</body>
+</html>
